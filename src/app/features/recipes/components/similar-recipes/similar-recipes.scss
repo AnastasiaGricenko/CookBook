@@ -1,0 +1,10 @@
+.similar-recipes__title {
+  margin: 0 0 16px;
+  font-size: 20px;
+}
+
+.similar-recipes__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}

@@ -1,0 +1,14 @@
+<div class="notification-toast">
+  @for (notification of notifications(); track notification.id) {
+    <button
+      type="button"
+      class="notification-toast__item"
+      [class.notification-toast__item--success]="notification.type === 'success'"
+      [class.notification-toast__item--error]="notification.type === 'error'"
+      [class.notification-toast__item--info]="notification.type === 'info'"
+      (click)="dismiss(notification.id)"
+    >
+      {{ notification.message }}
+    </button>
+  }
+</div>

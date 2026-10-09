@@ -1,0 +1,27 @@
+<section class="recipes-page">
+  <div class="recipes-page__head">
+    <h1 class="recipes-page__title">Рецепты</h1>
+    <input
+      class="recipes-page__search"
+      type="search"
+      placeholder="Поиск по названию или автору…"
+      [formControl]="searchControl"
+    />
+  </div>
+
+  @if (loading()) {
+    <app-progress-bar [progress]="60" />
+  }
+
+  <p class="recipes-page__count">Найдено рецептов: {{ total() }}</p>
+
+  @if (recipes().length) {
+    <div class="recipes-grid">
+      @for (recipe of recipes(); track recipe.id) {
+        <app-recipe-card [recipe]="recipe" />
+      }
+    </div>
+  } @else if (!loading()) {
+    <p class="recipes-page__empty">Ничего не найдено. Попробуйте изменить запрос.</p>
+  }
+</section>

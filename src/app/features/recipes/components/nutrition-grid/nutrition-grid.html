@@ -1,0 +1,21 @@
+<section class="panel">
+  <h2 class="panel__title">Пищевая ценность</h2>
+  <div class="nutrition-grid">
+    <div class="nutrition-grid__cell">
+      <span class="nutrition-grid__value">{{ nutrition().kcal }}</span>
+      <span class="nutrition-grid__label">ккал</span>
+    </div>
+    <div class="nutrition-grid__cell">
+      <span class="nutrition-grid__value">{{ nutrition().protein }} г</span>
+      <span class="nutrition-grid__label">Белки</span>
+    </div>
+    <div class="nutrition-grid__cell">
+      <span class="nutrition-grid__value">{{ nutrition().fat }} г</span>
+      <span class="nutrition-grid__label">Жиры</span>
+    </div>
+    <div class="nutrition-grid__cell">
+      <span class="nutrition-grid__value">{{ nutrition().carbs }} г</span>
+      <span class="nutrition-grid__label">Углеводы</span>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,117 @@
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 24px;
+}
+
+.app-header__brand {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+
+  span {
+    color: var(--accent);
+  }
+}
+
+.app-header__search {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.app-header__search-input {
+  width: 100%;
+  max-width: 420px;
+  padding: 8px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text);
+  outline: none;
+
+  &:focus {
+    border-color: var(--accent);
+  }
+}
+
+.app-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.app-header__nav-link {
+  color: var(--text-secondary);
+  font-weight: 500;
+
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.app-header__login {
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 500;
+
+  &:hover {
+    background: var(--accent-hover);
+  }
+}
+
+.app-header__user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+}
+
+.app-header__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.app-header__user-name {
+  font-weight: 500;
+}
+
+.app-header__menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header__menu-item {
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-2);
+  }
+}
+
+.app-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
