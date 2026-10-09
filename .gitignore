@@ -40,3 +40,6 @@ desktop.ini
 
 # Покрытие тестов
 /coverage
+
+# Деплой
+Dockerfile
