@@ -1,0 +1,40 @@
+<header class="app-header">
+  <div class="app-header__inner">
+    <a class="app-header__brand" routerLink="/recipes">Кули<span>Book</span></a>
+
+    <div class="app-header__search">
+      <input
+        class="app-header__search-input"
+        type="search"
+        placeholder="Поиск рецептов…"
+        (keyup.enter)="onSearch($event)"
+      />
+    </div>
+
+    <nav class="app-header__nav">
+      <a class="app-header__nav-link" routerLink="/recipes">Рецепты</a>
+
+      @if (currentUser(); as user) {
+        <app-dropdown>
+          <span trigger class="app-header__user">
+            @if (user.avatarUrl) {
+              <img class="app-header__avatar" [src]="user.avatarUrl" [alt]="user.name" />
+            }
+            <span class="app-header__user-name">{{ user.name }}</span>
+          </span>
+          <div menu class="app-header__menu">
+            <button type="button" class="app-header__menu-item" (click)="logout()">Выйти</button>
+          </div>
+        </app-dropdown>
+      } @else {
+        <a class="app-header__login" routerLink="/auth/login">Войти</a>
+      }
+    </nav>
+  </div>
+</header>
+
+<main class="app-content">
+  <router-outlet />
+</main>
+
+<app-notification-toast />

@@ -1,0 +1,19 @@
+<section class="panel">
+  <h2 class="panel__title">Ингредиенты</h2>
+  <ul class="ingredient-list">
+    @for (ingredient of ingredients(); track ingredient.name; let i = $index) {
+      <li class="ingredient-list__item" [class.ingredient-list__item--done]="isChecked(i)">
+        <label class="ingredient-list__label">
+          <input
+            class="ingredient-list__checkbox"
+            type="checkbox"
+            [checked]="isChecked(i)"
+            (change)="toggle(i)"
+          />
+          <span class="ingredient-list__name">{{ ingredient.name }}</span>
+          <span class="ingredient-list__amount">{{ ingredient.amount }}</span>
+        </label>
+      </li>
+    }
+  </ul>
+</section>

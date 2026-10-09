@@ -1,0 +1,8 @@
+<section class="similar-recipes">
+  <h2 class="similar-recipes__title">Похожие рецепты</h2>
+  <div class="similar-recipes__grid">
+    @for (recipe of recipes(); track recipe.id) {
+      <app-recipe-card [recipe]="recipe" />
+    }
+  </div>
+</section>

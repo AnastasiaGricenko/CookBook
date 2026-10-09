@@ -1,0 +1,41 @@
+.panel {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.panel__title {
+  margin: 0 0 16px;
+  font-size: 18px;
+}
+
+.seasoning-panel {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.seasoning-panel__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--surface-2);
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.seasoning-panel__checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.seasoning-panel__name--done {
+  color: var(--text-secondary);
+  text-decoration: line-through;
+}

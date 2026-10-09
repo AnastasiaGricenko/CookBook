@@ -1,0 +1,34 @@
+<section class="auth-card">
+  <h1 class="auth-card__title">Вход</h1>
+  <p class="auth-card__hint">Демо-доступ: demo&#64;kulibook.ru / demo123</p>
+
+  <form class="auth-card__form" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label class="field">
+      <span class="field__label">Email</span>
+      <input class="field__input" type="email" formControlName="email" placeholder="you@example.com" />
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+        <span class="field__error">Введите корректный email</span>
+      }
+    </label>
+
+    <label class="field">
+      <span class="field__label">Пароль</span>
+      <input class="field__input" type="password" formControlName="password" placeholder="Минимум 6 символов" />
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <span class="field__error">Пароль не короче 6 символов</span>
+      }
+    </label>
+
+    <button class="auth-card__submit" type="submit" [disabled]="submitting.active()">
+      {{ submitting.active() ? 'Вход…' : 'Войти' }}
+    </button>
+  </form>
+
+  <button class="auth-card__google" type="button" (click)="onGoogle()">
+    Войти через Google
+  </button>
+
+  <p class="auth-card__footer">
+    Нет аккаунта? <a routerLink="/auth/register">Зарегистрируйтесь</a>
+  </p>
+</section>

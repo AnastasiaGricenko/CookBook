@@ -1,0 +1,27 @@
+<div class="guest-shell">
+  <header class="guest-shell__topbar">
+    <a class="guest-shell__brand" routerLink="/recipes">Кули<span>Book</span></a>
+    <nav class="guest-shell__tabs">
+      <a
+        class="guest-shell__tab"
+        routerLink="/auth/login"
+        routerLinkActive="guest-shell__tab--active"
+      >
+        Вход
+      </a>
+      <a
+        class="guest-shell__tab"
+        routerLink="/auth/register"
+        routerLinkActive="guest-shell__tab--active"
+      >
+        Регистрация
+      </a>
+    </nav>
+  </header>
+
+  <main class="guest-shell__content">
+    <router-outlet />
+  </main>
+</div>
+
+<app-notification-toast />

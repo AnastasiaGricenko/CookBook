@@ -1,0 +1,18 @@
+<section class="panel">
+  <h2 class="panel__title">Приправы</h2>
+  <ul class="seasoning-panel">
+    @for (seasoning of seasonings(); track seasoning; let i = $index) {
+      <li class="seasoning-panel__item">
+        <label class="seasoning-panel__label">
+          <input
+            class="seasoning-panel__checkbox"
+            type="checkbox"
+            [checked]="isChecked(i)"
+            (change)="toggle(i)"
+          />
+          <span [class.seasoning-panel__name--done]="isChecked(i)">{{ seasoning }}</span>
+        </label>
+      </li>
+    }
+  </ul>
+</section>

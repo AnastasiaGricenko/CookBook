@@ -1,0 +1,13 @@
+<a [routerLink]="['/recipes', recipe().id]" class="recipe-card">
+  <div class="recipe-card__image">
+    <img [src]="recipe().imageUrl" [alt]="recipe().title" loading="lazy" />
+  </div>
+  <div class="recipe-card__content">
+    <h3 class="recipe-card__title">{{ recipe().title }}</h3>
+    <div class="recipe-card__meta">
+      <span>{{ recipe().timeMinutes }} мин</span>
+      <span>{{ recipe().kcal }} ккал</span>
+    </div>
+    <p class="recipe-card__author">{{ recipe().author }}</p>
+  </div>
+</a>

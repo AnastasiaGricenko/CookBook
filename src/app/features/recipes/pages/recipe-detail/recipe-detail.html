@@ -1,0 +1,46 @@
+@if (recipe(); as item) {
+  <article class="recipe-detail">
+    <div class="recipe-detail__hero">
+      <img class="recipe-detail__image" [src]="item.imageUrl" [alt]="item.title" />
+    </div>
+
+    <header class="recipe-detail__header">
+      <h1 class="recipe-detail__title">{{ item.title }}</h1>
+
+      <div class="recipe-detail__meta">
+        <span>{{ item.timeMinutes }} мин</span>
+        <span>{{ item.servings }} порции</span>
+        <span>{{ item.difficulty }}</span>
+      </div>
+
+      <div class="recipe-detail__author">
+        <img class="recipe-detail__avatar" [src]="item.authorAvatar" [alt]="item.author" />
+        <span class="recipe-detail__author-name">{{ item.author }}</span>
+        <button class="recipe-detail__favorite" type="button" (click)="toggleFavorite()">
+          {{ item.isFavorite ? '★ В избранном' : '☆ В избранное' }}
+        </button>
+      </div>
+    </header>
+
+    <p class="recipe-detail__description">{{ item.description }}</p>
+
+    @if (item.tags.length) {
+      <div class="recipe-detail__tags">
+        @for (tag of item.tags; track tag) {
+          <span class="recipe-detail__tag">{{ tag }}</span>
+        }
+      </div>
+    }
+
+    <app-nutrition-grid [nutrition]="item.nutrition" />
+    <app-ingredient-list [ingredients]="item.ingredients" />
+    <app-seasoning-panel [seasonings]="item.seasonings" />
+    <app-steps-section [steps]="item.steps" />
+
+    @if (similar().length) {
+      <app-similar-recipes [recipes]="similar()" />
+    }
+  </article>
+} @else {
+  <p class="recipe-detail__loading">Загрузка рецепта…</p>
+}

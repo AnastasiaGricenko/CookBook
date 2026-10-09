@@ -1,0 +1,14 @@
+<section class="panel">
+  <h2 class="panel__title">Приготовление</h2>
+  <ol class="steps-section">
+    @for (step of steps(); track step.title; let i = $index) {
+      <li class="steps-section__item">
+        <span class="steps-section__number">{{ i + 1 }}</span>
+        <div class="steps-section__body">
+          <h3 class="steps-section__title">{{ step.title }}</h3>
+          <p class="steps-section__text">{{ step.text }}</p>
+        </div>
+      </li>
+    }
+  </ol>
+</section>
