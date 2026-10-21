@@ -1,0 +1,11 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "Auth": {
+    "JwtKey": "local-dev-jwt-key-please-change-me-32+"
+  }
+}

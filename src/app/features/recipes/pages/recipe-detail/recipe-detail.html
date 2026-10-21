@@ -16,9 +16,6 @@
       <div class="recipe-detail__author">
         <img class="recipe-detail__avatar" [src]="item.authorAvatar" [alt]="item.author" />
         <span class="recipe-detail__author-name">{{ item.author }}</span>
-        <button class="recipe-detail__favorite" type="button" (click)="toggleFavorite()">
-          {{ item.isFavorite ? '★ В избранном' : '☆ В избранное' }}
-        </button>
       </div>
     </header>
 

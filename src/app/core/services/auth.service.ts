@@ -1,64 +1,84 @@
 /**
  * core/services/auth.service.ts — сервис аутентификации.
  *
- * Роль в архитектуре: тонкая обёртка над MockApiClient для домена auth.
- * Страницы и оболочки зависят только от этого сервиса, а не от мок-слоя.
+ * Роль в архитектуре: тонкий слой над REST API домена auth. Страницы и
+ * оболочки зависят только от этого сервиса, а не от HttpClient напрямую.
  * Единственное место, где приложение читает текущего пользователя.
  *
  * Гарантии:
  *  - currentUser — read-only сигнал, обновляется login/register/loadMe/logout;
- *  - isAuthenticated синхронен (сессия в localStorage) — безопасен для guard;
- *  - loadMe идемпотентен и безопасен после F5: при отсутствии сессии → null.
+ *  - loadMe мемоизируется: повторные вызовы guard'ов не порождают запросов;
+ *  - 401 при восстановлении сессии означает гостя, а не ошибку экрана;
+ *  - httpOnly-cookie сессии ставится сервером, токен в JS не попадает.
  */
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
+import { catchError, firstValueFrom, of, tap } from 'rxjs';
 import { LoginParams, MeDto, RegisterParams } from '../../shared/models';
-import { MockApiClient } from '../../mock/mock-api-client';
-import { SessionStore } from '../../mock/auth/session-store';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly client = inject(MockApiClient);
-  private readonly session = inject(SessionStore);
+  private readonly http = inject(HttpClient);
   private readonly currentUserState = signal<MeDto | null>(null);
+
+  /** Кэш восстановления сессии: Promise выполняется один раз. */
+  private mePromise: Promise<MeDto | null> | null = null;
 
   readonly currentUser = this.currentUserState.asReadonly();
 
-  /** Синхронная проверка наличия сессии — используется guard'ами. */
-  isAuthenticated(): boolean {
-    return this.session.hasUser();
-  }
-
+  /** Вход: сервер проверяет данные и ставит httpOnly-cookie. */
   async login(params: LoginParams): Promise<MeDto> {
-    const user = await this.client.call<MeDto>('auth.login', params);
-    this.currentUserState.set(user);
-    return user;
+    return firstValueFrom(
+      this.http.post<MeDto>('auth/login', params).pipe(
+        tap(user => this.setCurrentUser(user)),
+      ),
+    );
   }
 
+  /** Регистрация с автовходом (сервер тоже ставит cookie). */
   async register(params: RegisterParams): Promise<MeDto> {
-    const user = await this.client.call<MeDto>('auth.register', params);
-    this.currentUserState.set(user);
-    return user;
+    return firstValueFrom(
+      this.http.post<MeDto>('auth/register', params).pipe(
+        tap(user => this.setCurrentUser(user)),
+      ),
+    );
   }
 
+  /** Выход: сервер удаляет cookie; локальное состояние сбрасывается в любом случае. */
   async logout(): Promise<void> {
-    await this.client.call<null>('auth.logout', null);
+    try {
+      await firstValueFrom(
+        this.http.post<void>('auth/logout', null).pipe(
+          catchError(() => of(void 0)),
+        ),
+      );
+    } finally {
+      this.handleUnauthorized();
+    }
+  }
+
+  /** Восстанавливает текущего пользователя по cookie (например, после F5). */
+  async loadMe(): Promise<MeDto | null> {
+    this.mePromise ??= firstValueFrom(
+      this.http.get<MeDto>('auth/me').pipe(
+        catchError(() => of<MeDto | null>(null)),
+      ),
+    ).then(user => {
+      this.currentUserState.set(user);
+      return user;
+    });
+
+    return this.mePromise;
+  }
+
+  /** Сброс кэша пользователя — вызывается интерцептором ошибок при 401. */
+  handleUnauthorized(): void {
+    this.mePromise = null;
     this.currentUserState.set(null);
   }
 
-  /** Восстанавливает текущего пользователя по сессии (например, после F5). */
-  async loadMe(): Promise<MeDto | null> {
-    if (!this.session.hasUser()) {
-      return null;
-    }
-    try {
-      const user = await this.client.call<MeDto>('auth.me', null);
-      this.currentUserState.set(user);
-      return user;
-    } catch {
-      // Сессия оказалась невалидной — очищаем её и продолжаем как гость.
-      this.session.clear();
-      this.currentUserState.set(null);
-      return null;
-    }
+  private setCurrentUser(user: MeDto): void {
+    this.mePromise = Promise.resolve(user);
+    this.currentUserState.set(user);
   }
 }

@@ -2,22 +2,23 @@
  * core/config/app.config.ts — конфигурация провайдеров приложения.
  *
  * Роль в архитектуре: корневой композиционный корень. Здесь собраны роутер
- * и единственный bootstrap-хук, поднимающий мок-слой до первого обращения
- * страниц к сервисам. HTTP-провайдеров нет принципиально (только мок-слой).
+ * и HTTP-провайдеры: HttpClient с интерцепторами префикса API и ошибок.
  *
  * Гарантии:
- *  - setupMockLayer выполняется через provideAppInitializer (после DI, до старта);
- *  - withComponentInputBinding позволяет странице рецепта получать :id как input.
+ *  - все запросы идут через HttpClient (fetch/XMLHttpRequest не используются);
+ *  - withComponentInputBinding позволяет странице рецепта получать :id как input;
+ *  - транспортные правила (префикс, cookie, ApiError) заданы в интерцепторах.
  */
-import { ApplicationConfig, provideAppInitializer } from '@angular/core';
+import { ApplicationConfig } from '@angular/core';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
-import { setupMockLayer } from '../../mock';
+import { apiErrorInterceptor } from '../http/api-error.interceptor';
+import { apiPrefixInterceptor } from '../http/api-prefix.interceptor';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes, withComponentInputBinding()),
-    // Мок-слой поднимается до первого рендера: сид + регистрация обработчиков.
-    provideAppInitializer(() => setupMockLayer()),
+    provideHttpClient(withInterceptors([apiPrefixInterceptor, apiErrorInterceptor])),
   ],
 };

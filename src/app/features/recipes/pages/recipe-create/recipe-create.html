@@ -1,0 +1,226 @@
+<section class="recipe-create">
+  <div class="recipe-create__head">
+    <div>
+      <h1 class="recipe-create__title">Новый рецепт</h1>
+      <p class="recipe-create__hint">Рецепт появится в каталоге от вашего имени</p>
+    </div>
+    <a class="recipe-create__back" routerLink="/recipes">← К рецептам</a>
+  </div>
+
+  <form class="recipe-create__form" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="recipe-create__card">
+      <label class="form-field">
+        <span class="form-field__label">Название</span>
+        <input
+          class="form-field__input"
+          type="text"
+          formControlName="title"
+          placeholder="Например, гуляш по-домашнему"
+        />
+        @if (form.controls.title.touched && form.controls.title.invalid) {
+          <span class="form-field__error">Укажите название (до 100 символов)</span>
+        }
+      </label>
+
+      <label class="form-field">
+        <span class="form-field__label">Изображение</span>
+        <select class="form-field__input" formControlName="imageUrl">
+          @for (option of imageOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="recipe-create__grid">
+        <label class="form-field">
+          <span class="form-field__label">Время, мин</span>
+          <input
+            class="form-field__input"
+            type="number"
+            min="1"
+            max="1440"
+            formControlName="timeMinutes"
+          />
+          @if (form.controls.timeMinutes.touched && form.controls.timeMinutes.invalid) {
+            <span class="form-field__error">От 1 до 1440 минут</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-field__label">Порции</span>
+          <input
+            class="form-field__input"
+            type="number"
+            min="1"
+            max="100"
+            formControlName="servings"
+          />
+          @if (form.controls.servings.touched && form.controls.servings.invalid) {
+            <span class="form-field__error">От 1 до 100 порций</span>
+          }
+        </label>
+
+        <label class="form-field">
+          <span class="form-field__label">Сложность</span>
+          <select class="form-field__input" formControlName="difficulty">
+            <option value="Легкая">Легкая</option>
+            <option value="Средняя">Средняя</option>
+            <option value="Сложная">Сложная</option>
+          </select>
+        </label>
+      </div>
+
+      <label class="form-field">
+        <span class="form-field__label">Описание</span>
+        <textarea
+          class="form-field__input recipe-create__textarea"
+          rows="4"
+          formControlName="description"
+          placeholder="Чем это блюдо особенно?"
+        ></textarea>
+        @if (form.controls.description.touched && form.controls.description.invalid) {
+          <span class="form-field__error">Добавьте описание (до 1000 символов)</span>
+        }
+      </label>
+    </div>
+
+    <fieldset class="recipe-create__card recipe-create__group">
+      <legend class="recipe-create__legend">Пищевая ценность</legend>
+      <div class="recipe-create__grid" formGroupName="nutrition">
+        <label class="form-field">
+          <span class="form-field__label">Ккал</span>
+          <input class="form-field__input" type="number" min="0" max="10000" formControlName="kcal" />
+          @if (form.controls.nutrition.controls.kcal.touched && form.controls.nutrition.controls.kcal.invalid) {
+            <span class="form-field__error">От 0 до 10000</span>
+          }
+        </label>
+        <label class="form-field">
+          <span class="form-field__label">Белки</span>
+          <input class="form-field__input" type="number" min="0" max="10000" formControlName="protein" />
+          @if (form.controls.nutrition.controls.protein.touched && form.controls.nutrition.controls.protein.invalid) {
+            <span class="form-field__error">От 0 до 10000</span>
+          }
+        </label>
+        <label class="form-field">
+          <span class="form-field__label">Жиры</span>
+          <input class="form-field__input" type="number" min="0" max="10000" formControlName="fat" />
+          @if (form.controls.nutrition.controls.fat.touched && form.controls.nutrition.controls.fat.invalid) {
+            <span class="form-field__error">От 0 до 10000</span>
+          }
+        </label>
+        <label class="form-field">
+          <span class="form-field__label">Углеводы</span>
+          <input class="form-field__input" type="number" min="0" max="10000" formControlName="carbs" />
+          @if (form.controls.nutrition.controls.carbs.touched && form.controls.nutrition.controls.carbs.invalid) {
+            <span class="form-field__error">От 0 до 10000</span>
+          }
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="recipe-create__card recipe-create__group">
+      <legend class="recipe-create__legend">Ингредиенты</legend>
+      <div class="recipe-create__list" formArrayName="ingredients">
+        @for (row of ingredients.controls; track $index) {
+          <div class="recipe-create__row" [formGroupName]="$index">
+            <div class="recipe-create__cell">
+              <input class="form-field__input" type="text" formControlName="name" placeholder="Название" />
+              @if (row.controls['name'].touched && row.controls['name'].invalid) {
+                <span class="form-field__error">Укажите название</span>
+              }
+            </div>
+            <div class="recipe-create__cell">
+              <input class="form-field__input" type="text" formControlName="amount" placeholder="Количество (500 г)" />
+              @if (row.controls['amount'].touched && row.controls['amount'].invalid) {
+                <span class="form-field__error">Укажите количество</span>
+              }
+            </div>
+            <button
+              class="btn btn--secondary recipe-create__row-remove"
+              type="button"
+              [disabled]="ingredients.length === 1"
+              (click)="removeIngredient($index)"
+            >
+              Удалить
+            </button>
+          </div>
+        }
+      </div>
+      <button class="btn btn--secondary" type="button" (click)="addIngredient()">
+        Добавить ингредиент
+      </button>
+    </fieldset>
+
+    <div class="recipe-create__card">
+      <label class="form-field">
+        <span class="form-field__label">Приправы</span>
+        <input
+          class="form-field__input"
+          type="text"
+          formControlName="seasonings"
+          placeholder="соль, перец, лавровый лист"
+        />
+        <span class="recipe-create__field-hint">Через запятую; можно оставить пустым</span>
+      </label>
+    </div>
+
+    <fieldset class="recipe-create__card recipe-create__group">
+      <legend class="recipe-create__legend">Приготовление</legend>
+      <div class="recipe-create__list" formArrayName="steps">
+        @for (row of steps.controls; track $index) {
+          <div class="recipe-create__step" [formGroupName]="$index">
+            <div class="recipe-create__step-head">
+              <span class="recipe-create__step-number">Шаг {{ $index + 1 }}</span>
+              <button
+                class="recipe-create__step-remove"
+                type="button"
+                [disabled]="steps.length === 1"
+                (click)="removeStep($index)"
+              >
+                Удалить
+              </button>
+            </div>
+            <div class="recipe-create__cell">
+              <input class="form-field__input" type="text" formControlName="title" placeholder="Заголовок шага" />
+              @if (row.controls['title'].touched && row.controls['title'].invalid) {
+                <span class="form-field__error">Укажите заголовок</span>
+              }
+            </div>
+            <div class="recipe-create__cell">
+              <textarea
+                class="form-field__input recipe-create__textarea"
+                rows="2"
+                formControlName="text"
+                placeholder="Что нужно сделать?"
+              ></textarea>
+              @if (row.controls['text'].touched && row.controls['text'].invalid) {
+                <span class="form-field__error">Опишите шаг</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+      <button class="btn btn--secondary" type="button" (click)="addStep()">Добавить шаг</button>
+    </fieldset>
+
+    <div class="recipe-create__card">
+      <label class="form-field">
+        <span class="form-field__label">Теги</span>
+        <input
+          class="form-field__input"
+          type="text"
+          formControlName="tags"
+          placeholder="второе, мясо, домашнее"
+        />
+        <span class="recipe-create__field-hint">Через запятую; можно оставить пустым</span>
+      </label>
+    </div>
+
+    <div class="recipe-create__actions">
+      <button class="btn btn--primary" type="submit" [disabled]="submitting.active()">
+        {{ submitting.active() ? 'Сохранение…' : 'Сохранить рецепт' }}
+      </button>
+      <a class="recipe-create__cancel" routerLink="/recipes">Отмена</a>
+    </div>
+  </form>
+</section>

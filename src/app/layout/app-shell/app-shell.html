@@ -13,6 +13,7 @@
 
     <nav class="app-header__nav">
       <a class="app-header__nav-link" routerLink="/recipes">Рецепты</a>
+      <a class="app-header__nav-link" routerLink="/recipes/new">Добавить рецепт</a>
 
       @if (currentUser(); as user) {
         <app-dropdown>
