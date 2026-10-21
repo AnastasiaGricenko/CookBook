@@ -7,21 +7,32 @@
  *
  * Гарантии:
  *  - 'new' объявлен раньше ':id', иначе создание перехватится как идентификатор;
- *  - создание закрыто authGuard: гость уходит на /auth/register.
+ *  - создание закрыто authGuard: гость уходит на /auth/register;
+ *  - каждая страница подключена loadComponent — чанк грузится при первой
+ *    навигации; компоненты страниц и их зависимости в стартовый бандл
+ *    не попадают.
  */
 import { Routes } from '@angular/router';
 import { authGuard } from '../../core/navigation/guards';
-import { RecipesPage } from './pages/recipes-page/recipes-page';
-import { RecipeDetailPage } from './pages/recipe-detail/recipe-detail';
-import { RecipeCreatePage } from './pages/recipe-create/recipe-create';
 
 export const RECIPES_ROUTES: Routes = [
-  { path: '', component: RecipesPage, title: 'КулиBook — Рецепты' },
+  {
+    path: '',
+    loadComponent: () =>
+      import('./pages/recipes-page/recipes-page').then(m => m.RecipesPage),
+    title: 'КулиBook — Рецепты',
+  },
   {
     path: 'new',
-    component: RecipeCreatePage,
+    loadComponent: () =>
+      import('./pages/recipe-create/recipe-create').then(m => m.RecipeCreatePage),
     canActivate: [authGuard],
     title: 'КулиBook — Новый рецепт',
   },
-  { path: ':id', component: RecipeDetailPage, title: 'КулиBook — Рецепт' },
+  {
+    path: ':id',
+    loadComponent: () =>
+      import('./pages/recipe-detail/recipe-detail').then(m => m.RecipeDetailPage),
+    title: 'КулиBook — Рецепт',
+  },
 ];
