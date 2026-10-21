@@ -2,7 +2,7 @@
  * RecipeDetailPage — страница отдельного рецепта.
  *
  * Роль в архитектуре: страница-контейнер фичи recipes. Получает :id как input
- * (withComponentInputBinding), загружает рецепт и похожие, управляет избранным.
+ * (withComponentInputBinding), загружает рецепт и похожие.
  * Составные блоки вынесены в components/ и получают данные через input.
  *
  * Гарантии:
@@ -47,25 +47,6 @@ export class RecipeDetailPage {
       const id = this.id();
       void this.load(id);
     });
-  }
-
-  protected toggleFavorite(): void {
-    const recipe = this.recipeState();
-    if (!recipe) {
-      return;
-    }
-    void this.toggle(recipe.id);
-  }
-
-  private async toggle(id: string): Promise<void> {
-    try {
-      const result = await this.recipesService.toggleFavorite(id);
-      this.recipeState.update(current =>
-        current ? { ...current, isFavorite: result.isFavorite } : current,
-      );
-    } catch (error) {
-      this.notifications.show(toApiError(error).body.message, 'error');
-    }
   }
 
   private async load(id: string): Promise<void> {

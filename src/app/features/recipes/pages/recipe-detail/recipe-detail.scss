@@ -45,20 +45,7 @@
 }
 
 .recipe-detail__author-name {
-  margin-right: auto;
-}
-
-.recipe-detail__favorite {
-  padding: 9px 16px;
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  cursor: pointer;
-
-  &:hover {
-    border-color: var(--accent);
-  }
+  color: var(--text-secondary);
 }
 
 .recipe-detail__description {

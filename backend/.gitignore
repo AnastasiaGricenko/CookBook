@@ -1,0 +1,9 @@
+# Артефакты сборки .NET
+bin/
+obj/
+
+# Локальная конфигурация разработчика с секретом (в репозитории только .template)
+CookBook.Api/appsettings.Development.json
+
+# Глобальный шаблон *.sln из родительского .gitignore не должен скрывать решение
+!CookBook.sln

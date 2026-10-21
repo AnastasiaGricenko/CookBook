@@ -9,6 +9,7 @@
  * Карта URL:
  *  - '/'                     → homeGuard → '/recipes' (канонизация);
  *  - '/recipes'              → AppShell + список (публично);
+ *  - '/recipes/new'          → AppShell + создание рецепта (authGuard);
  *  - '/recipes/:id'          → AppShell + карточка рецепта (публично);
  *  - '/auth' + '/auth/login' | '/auth/register' → GuestShell + формы (guestGuard);
  *  - '**'                    → homeGuard (фолбэк на домашний маршрут роли).

@@ -1,44 +1,72 @@
 /**
  * core/services/recipe.service.ts — сервис рецептов.
  *
- * Роль в архитектуре: тонкая обёртка над MockApiClient для домена recipes.
- * Никакой фильтрации/пагинации — это ответственность обработчиков мок-слоя.
- * Потребляется страницами фичи recipes.
+ * Роль в архитектуре: тонкий слой над REST API домена recipes. Поиск,
+ * пагинация и порядок выдачи — ответственность сервера; сервис только
+ * формулирует запрос и возвращает Promise страницам.
  *
  * Гарантии:
- *  - методы возвращают Promise (без потоков RxJS для данных);
- *  - toggleFavorite меняет состояние в мок-БД через транзакцию обработчика.
+ *  - все методы возвращают Promise (Observable живёт до firstValueFrom);
+ *  - каждый вызов — явный HTTP-метод (get/post) с продолжением в .pipe();
+ *  - относительные пути без ведущего слэша: префикс добавит интерцептор.
  */
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { PagedResult, Recipe, RecipeCard } from '../../shared/models';
-import { MockApiClient } from '../../mock/mock-api-client';
+import { firstValueFrom, map } from 'rxjs';
+import {
+  CreateRecipeParams,
+  PagedResult,
+  RECIPES_PAGE_SIZE,
+  Recipe,
+  RecipeCard,
+} from '../../shared/models';
 
 export interface RecipeListParams {
   query: string;
   page: number;
 }
 
-export interface FavoriteResult {
-  isFavorite: boolean;
-}
-
 @Injectable({ providedIn: 'root' })
 export class RecipeService {
-  private readonly client = inject(MockApiClient);
+  private readonly http = inject(HttpClient);
 
   getList(params: RecipeListParams): Promise<PagedResult<RecipeCard>> {
-    return this.client.call<PagedResult<RecipeCard>>('recipes.list', params);
+    const httpParams = new HttpParams()
+      .set('query', params.query)
+      .set('page', params.page)
+      .set('pageSize', RECIPES_PAGE_SIZE);
+
+    return firstValueFrom(
+      this.http.get<PagedResult<RecipeCard>>('recipes', { params: httpParams }).pipe(
+        map(page => ({ ...page, items: page.items ?? [] })),
+      ),
+    );
   }
 
   get(id: string): Promise<Recipe> {
-    return this.client.call<Recipe>('recipes.get', { id });
+    return firstValueFrom(this.http.get<Recipe>(`recipes/${id}`));
   }
 
   getSimilar(id: string): Promise<RecipeCard[]> {
-    return this.client.call<RecipeCard[]>('recipes.similar', { id });
+    return firstValueFrom(
+      this.http.get<RecipeCard[]>(`recipes/${id}/similar`).pipe(
+        map(cards => cards ?? []),
+      ),
+    );
   }
 
-  toggleFavorite(id: string): Promise<FavoriteResult> {
-    return this.client.call<FavoriteResult>('recipes.toggleFavorite', { id });
+  /** Создаёт рецепт от имени текущего пользователя (требует cookie сессии). */
+  create(params: CreateRecipeParams): Promise<Recipe> {
+    return firstValueFrom(
+      this.http.post<Recipe>('recipes', params).pipe(
+        map(recipe => ({
+          ...recipe,
+          ingredients: recipe.ingredients ?? [],
+          seasonings: recipe.seasonings ?? [],
+          steps: recipe.steps ?? [],
+          tags: recipe.tags ?? [],
+        })),
+      ),
+    );
   }
 }

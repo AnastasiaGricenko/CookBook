@@ -6,10 +6,12 @@
  * реализовано немутирующим хелпером withGuards.
  *
  * Гарантии:
- *  - authGuard закрывает приватные маршруты и уводит гостя на /auth/login;
+ *  - authGuard закрывает приватные маршруты и уводит гостя на /auth/register;
  *  - guestGuard не пускает авторизованного в раздел auth (ведёт на ROLE_HOME);
  *  - homeGuard канонизирует вход «/» и «**» на домашний маршрут роли;
- *  - проверка синхронна (сессия в localStorage), потому переживает F5.
+ *  - проверка асинхронная: сессия восстанавливается по GET /auth/me,
+ *    результат мемоизируется в AuthService — повторные навигации не шлют запросы;
+ *  - зависимости берутся через inject() до первого await (injection context).
  */
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, Routes } from '@angular/router';
@@ -21,22 +23,22 @@ export const ROLE_HOME: Record<'guest' | 'user', string> = {
   user: '/recipes',
 };
 
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = async () => {
   const auth = inject(AuthService);
   const router = inject(Router);
-  return auth.isAuthenticated() ? true : router.createUrlTree(['/auth/login']);
+  return (await auth.loadMe()) ? true : router.createUrlTree(['/auth/register']);
 };
 
-export const guestGuard: CanActivateFn = () => {
+export const guestGuard: CanActivateFn = async () => {
   const auth = inject(AuthService);
   const router = inject(Router);
-  return auth.isAuthenticated() ? router.createUrlTree([ROLE_HOME.user]) : true;
+  return (await auth.loadMe()) ? router.createUrlTree([ROLE_HOME.user]) : true;
 };
 
-export const homeGuard: CanActivateFn = () => {
+export const homeGuard: CanActivateFn = async () => {
   const auth = inject(AuthService);
   const router = inject(Router);
-  const role = auth.isAuthenticated() ? 'user' : 'guest';
+  const role = (await auth.loadMe()) ? 'user' : 'guest';
   return router.createUrlTree([ROLE_HOME[role]]);
 };
 
