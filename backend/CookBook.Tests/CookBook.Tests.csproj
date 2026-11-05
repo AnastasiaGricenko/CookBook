@@ -20,4 +20,8 @@
     <ProjectReference Include="..\CookBook.Api\CookBook.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\docs\db\kulibook_init.sql" Link="kulibook_init.sql" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
