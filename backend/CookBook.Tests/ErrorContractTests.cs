@@ -1,7 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using CookBook.Api.Infrastructure.InMemory.Seed;
 
 namespace CookBook.Tests;
 
@@ -74,7 +73,7 @@ public sealed class ErrorContractTests(CookBookFactory factory) : IClassFixture<
     {
         var guest = TestHttp.CreateGuest(factory);
         var authorized = await TestHttp.CreateAuthorizedAsync(factory);
-        var borschId = SeedData.RecipeId(2);
+        var borschId = TestData.RecipeId(2);
 
         var responses = new[]
         {

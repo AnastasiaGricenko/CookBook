@@ -1,11 +1,14 @@
 using CookBook.Api.Domain.Repositories;
 using CookBook.Api.Domain.Security;
 using CookBook.Api.Domain.Services;
-using CookBook.Api.Infrastructure.InMemory;
-using CookBook.Api.Infrastructure.InMemory.Seed;
 using CookBook.Api.Infrastructure.Options;
+using CookBook.Api.Infrastructure.Persistence;
+using CookBook.Api.Infrastructure.Persistence.Ef;
+using CookBook.Api.Infrastructure.Persistence.Sql;
 using CookBook.Api.Infrastructure.Security;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Npgsql;
 
 namespace CookBook.Api.Infrastructure;
 
@@ -44,9 +47,6 @@ public static class InfrastructureDependencyInjection
         services.AddOptions<CorsOptions>()
             .Bind(configuration.GetSection(CorsOptions.SectionName));
 
-        services.AddOptions<SeedOptions>()
-            .Bind(configuration.GetSection(SeedOptions.SectionName));
-
         services.AddOptions<PersistenceOptions>()
             .Bind(configuration.GetSection(PersistenceOptions.SectionName));
 
@@ -54,26 +54,35 @@ public static class InfrastructureDependencyInjection
             .GetSection(PersistenceOptions.SectionName)
             .Get<PersistenceOptions>() ?? new PersistenceOptions();
 
-        if (!string.Equals(persistence.Provider, "InMemory", StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(persistence.Provider, "Postgres", StringComparison.OrdinalIgnoreCase))
         {
             throw new InvalidOperationException(
                 $"Persistence:Provider = «{persistence.Provider}» не поддерживается. " +
-                "Доступна только заглушка «InMemory»: реализуйте интерфейсы репозиториев домена " +
-                "поверх реальной БД и зарегистрируйте их в AddInfrastructure.");
+                "Доступен провайдер «Postgres».");
         }
 
-        services.AddSingleton<InMemoryDatabase>();
+        var connectionString = configuration.GetConnectionString("Default");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                "ConnectionStrings:Default не задан — укажите строку подключения к PostgreSQL " +
+                "в appsettings.Development.json, user-secrets или переменной окружения.");
+        }
 
-        services.TryAddSingleton<IUserRepository, InMemoryUserRepository>();
-        services.TryAddSingleton<IRecipeRepository, InMemoryRecipeRepository>();
+        services.AddDbContextFactory<CookBookDbContext>(options =>
+            options.UseNpgsql(connectionString, npgsql => npgsql.EnableRetryOnFailure()));
+
+        services.AddSingleton<NpgsqlDataSource>(_ =>
+            new NpgsqlDataSourceBuilder(connectionString).Build());
+
+        services.TryAddSingleton<IUserRepository, EfUserRepository>();        // 50% — EF Core
+        services.TryAddSingleton<IRecipeRepository, SqlRecipeRepository>();    // 50% — сырой SQL
 
         services.TryAddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.TryAddSingleton<ITokenService, JwtTokenService>();
 
         services.TryAddSingleton<IAuthService, AuthService>();
         services.TryAddSingleton<IRecipeService, RecipeService>();
-
-        services.TryAddSingleton<DatabaseSeeder>();
 
         return services;
     }

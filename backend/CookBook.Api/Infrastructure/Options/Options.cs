@@ -38,16 +38,6 @@ public sealed class PersistenceOptions
     /// <summary>Имя секции конфигурации.</summary>
     public const string SectionName = "Persistence";
 
-    /// <summary>Провайдер хранилища; поддерживается только InMemory.</summary>
-    public string Provider { get; set; } = "InMemory";
-}
-
-/// <summary>Настройки сида демо-данных (секция Seed).</summary>
-public sealed class SeedOptions
-{
-    /// <summary>Имя секции конфигурации.</summary>
-    public const string SectionName = "Seed";
-
-    /// <summary>Выполнять ли сид при старте.</summary>
-    public bool Enabled { get; set; } = true;
+    /// <summary>Провайдер хранилища; поддерживается только Postgres.</summary>
+    public string Provider { get; set; } = "Postgres";
 }

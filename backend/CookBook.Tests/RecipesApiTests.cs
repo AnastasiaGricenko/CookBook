@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Json;
-using CookBook.Api.Infrastructure.InMemory.Seed;
 using CookBook.Api.Presentation.Contracts;
 
 namespace CookBook.Tests;
@@ -8,8 +7,8 @@ namespace CookBook.Tests;
 /// <summary>Интеграционные тесты каталога рецептов от имени гостя.</summary>
 public sealed class RecipesApiTests(CookBookFactory factory) : IClassFixture<CookBookFactory>
 {
-    private static readonly Guid CarbonaraId = SeedData.RecipeId(1);
-    private static readonly Guid BorschId = SeedData.RecipeId(2);
+    private static readonly Guid CarbonaraId = TestData.RecipeId(1);
+    private static readonly Guid BorschId = TestData.RecipeId(2);
 
     [Fact]
     public async Task List_ReturnsEightCardsInSeedOrder()
